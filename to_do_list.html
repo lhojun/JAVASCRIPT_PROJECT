@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>To-Do List</title>
+	<style type="text/css">
+		#body_content
+		{
+			transition-property: background-color;
+			transition-duration: 300ms;
+			transition-timing-function: ease-out;
+		}
+		li
+		{
+			border-bottom: 1px solid black;
+			text-align: center;
+		}
+		#content_date
+		{
+			text-align: left;
+		}
+		#content_text
+		{
+			text-align: center;
+		}
+		table
+		{
+			margin : auto; 
+			width  : 50%; 
+			border-top : 1px solid black;
+			border-collapse: collapse;
+		}
+		th,td
+		{
+			border-bottom : 1px solid black;
+		}
+		#alert_text
+		{
+			display: none;
+			color:red;
+		}
+		#alert_br
+		{
+			display: inline;
+		}
+	</style>
+	<script type="text/javascript">
+		function plus_list()
+		{
+			let date = document.getElementById('date').value;
+			let content = document.getElementById('content').value;
+			if(content== "" || date == "")
+			{
+				var alert_text = document.getElementById("alert_text");
+				var background = document.getElementById("body_content");
+				var alert_br = document.getElementById("alert_br");
+					alert_text.style.display = "block";
+					alert_br.style.display = "none";
+					background.style.backgroundColor = "#F6CECE";
+					setTimeout(function(){
+						alert_br.style.display = "inline";
+						alert_text.style.display = "none";
+						background.style.backgroundColor = "#FFFFFF";
+					},300);
+				return -1;
+			}
+			// console.log(typeof(date));
+			// console.log(date);
+			// console.log(content_list);
+			let plus_object = document.createElement('tr');
+			plus_object.innerHTML = "<th style='width:30%;'>" + date + "</td><td>" + content + "</td>";
+			document.getElementById('content_list').appendChild(plus_object);
+			document.getElementById("content").value = "";
+		}
+
+		function key_down_event()
+		{
+			if(window.event.keyCode == 13)
+			{
+				let func_ans = plus_list();
+				if(func_ans == -1)
+				{
+					return
+				}
+				var background = document.getElementById("body_content");
+				background.style.backgroundColor = "#E0F8E0";
+				setTimeout(function(){
+					background.style.backgroundColor = "#FFFFFF";
+				},300);
+			}
+
+		}
+	</script>
+</head>
+<body style="text-align:center;" id="body_content">
+	<h1>To-Do List</h1>
+
+	<form id="content_form" onsubmit="return false;">
+		<input type ="date" id="date">
+		<input type="text" name="item" id="content" onkeydown="key_down_event();" placeholder="일정을 입력하세요">
+	</form>
+	<span id="alert_text">날짜 또는 일정을 입력하지 않았습니다!!!</span>
+	<br id ="alert_br">
+	<table id = "content_list">
+	</table>
+	<ul id="content_list" style="list-style: none; padding-left:0px; width : 50%; padding-left:25%;">
+	</ul>
+</body>
+</html>
