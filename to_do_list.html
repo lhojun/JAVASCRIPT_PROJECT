@@ -26,13 +26,17 @@
 		table
 		{
 			margin : auto; 
-			width  : 50%; 
+			width  : 75%; 
 			border-top : 1px solid black;
 			border-collapse: collapse;
 		}
 		th,td
 		{
 			border-bottom : 1px solid black;
+		}
+		th
+		{
+			width: 25%;
 		}
 		#alert_text
 		{
@@ -43,8 +47,13 @@
 		{
 			display: inline;
 		}
+		.content_inner
+		{
+			width:45%;
+		}
 	</style>
 	<script type="text/javascript">
+		var count = 0;
 		function plus_list()
 		{
 			let date = document.getElementById('date').value;
@@ -68,11 +77,22 @@
 			// console.log(date);
 			// console.log(content_list);
 			let plus_object = document.createElement('tr');
-			plus_object.innerHTML = "<th style='width:30%;'>" + date + "</td><td>" + content + "</td>";
+			plus_object.id = 'line_content'+count;
+			plus_object.innerHTML = "<th style='width:30%;'>" + date + "</td><td id = 'list"+count+"' class = 'content_inner'>" + content + "</td><td><button onclick='delete_list(this)' id = '"+count+"'>삭제하기</button></td><td><button onclick='edit_list(this)' id = '"+count+"'>수정하기</button></td>";
+			count++;
 			document.getElementById('content_list').appendChild(plus_object);
 			document.getElementById("content").value = "";
 		}
 
+		function delete_list(ele)
+		{
+			var get_count = document.getElementById(ele.getAttribute('id')).getAttribute('id');
+			var get_child = document.getElementById("line_content"+get_count);
+			var get_parent = document.getElementById("content_list");
+
+			get_parent.removeChild(get_child);
+
+		}
 		function key_down_event()
 		{
 			if(window.event.keyCode == 13)
