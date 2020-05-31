@@ -53,11 +53,128 @@
 		}
 	</style>
 	<script type="text/javascript">
-		var count = 0;
-		function plus_list()
+		function clone(obj) 
 		{
-			let date = document.getElementById('date').value;
-			let content = document.getElementById('content').value;
+		  if (obj === null || typeof(obj) !== 'object')
+		  return obj;
+
+		  var copy = obj.constructor();
+
+		  for (var attr in obj) {
+		    if (obj.hasOwnProperty(attr)) {
+		      copy[attr] = obj[attr];
+		    }
+		  }
+
+  		return copy;
+		}
+		let content_Obj = [];
+
+		function to_do_content(count,date, content, betweenDay,status)
+		{
+			this.id = count;
+			this.date = date;
+			this.content = content;
+			if(betweenDay < 0)
+			{
+				var color = '#D8D8D8';
+				var text_color = '#000000';
+				var hi_color = '#A4A4A4';
+			}
+			else if(betweenDay <= 3)
+			{
+				var color = '#F6CECE';
+				var text_color = '#FF0000';
+				var hi_color = '#F78181';
+			}
+			else if(betweenDay <= 7)
+			{
+				var color = '#F6E3CE';
+				var text_color = '#FF8000';
+				var hi_color = '#F7BE81';
+			}
+			else
+			{
+				var color = '#ffffff';
+				var text_color = '#000000';
+				var hi_color = '#E6E6E6';
+			}
+
+			this.status = status;
+			this.color = color;
+			this.text_color = text_color;
+			this.hi_color = hi_color;
+		}
+		function print_list(content_Obj)
+		{
+			var table_content = document.getElementById("content_list");
+			while(table_content.hasChildNodes())
+			{
+				table_content.removeChild(table_content.firstChild);
+			}
+			for(let pl=0; pl<content_Obj.length; pl++)
+			{
+				date = content_Obj[pl].date;
+				content = content_Obj[pl].content;
+				color = content_Obj[pl].color;
+				text_color = content_Obj[pl].text_color;
+				count = content_Obj[pl].id;
+				if(content_Obj[pl].status == "red")
+				{
+					var status = "🔴";
+				}
+				else if(content_Obj[pl].status == "org")
+				{
+					var status = "🟠";
+				}
+				else if(content_Obj[pl].status == "yel")
+				{
+					var status = "🟡";
+				}
+				else if(content_Obj[pl].status == "gre")
+				{
+					var status = "🟢";
+				}
+				let plus_object = document.createElement('tr');
+				plus_object.id = count;
+				plus_object.setAttribute('name','line_content_list');
+				plus_object.setAttribute('onmouseover','over(this)');
+				plus_object.setAttribute('onmouseout','out(this)');
+				plus_object.style.color = text_color;
+				plus_object.style.backgroundColor = color;
+				plus_object.innerHTML = "<td>"+status+"</td><th style='width:30%;'>" + date + "</td><td id = 'list"+count+"' class = 'content_inner'>" + content + "</td><td><button onclick='delete_list(this)' id = '"+count+"'>삭제하기</button></td><td><button onclick='edit_list(this)' id = '"+count+"'>수정하기</button></td>";
+					count++;
+					document.getElementById('content_list').appendChild(plus_object);	
+			}
+		}
+		var now_edit_id;
+		var now_edit_copy_id;
+		function edit_list(ele)
+		{
+			get_count = ele.getAttribute('id');
+			const finditem = content_Obj.find(function(item){
+				return item.id == get_count;
+			});
+			const idx = content_Obj.indexOf(finditem);
+			now_edit_id = idx;
+
+			const findcopyitem = content_copy.find(function(item){
+				return item.id == get_count;
+			});
+			const copy_idx = content_copy.indexOf(findcopyitem);
+			now_edit_copy_id = copy_idx;
+
+			document.getElementById('date').value = content_Obj[idx].date;
+			document.getElementById('content').value = content_Obj[idx].content;
+			document.getElementById('edit_button').style.display = 'inline-block';
+			document.getElementById('edit_reset').style.display = 'inline-block';
+			
+		}
+
+		function edit_confirm(ele)
+		{
+			var date = document.getElementById('date').value;
+			var content = document.getElementById('content').value;
 			if(content== "" || date == "")
 			{
 				var alert_text = document.getElementById("alert_text");
@@ -73,33 +190,196 @@
 					},300);
 				return -1;
 			}
-			// console.log(typeof(date));
-			// console.log(date);
-			// console.log(content_list);
-			let plus_object = document.createElement('tr');
-			plus_object.id = 'line_content'+count;
-			plus_object.innerHTML = "<th style='width:30%;'>" + date + "</td><td id = 'list"+count+"' class = 'content_inner'>" + content + "</td><td><button onclick='delete_list(this)' id = '"+count+"'>삭제하기</button></td><td><button onclick='edit_list(this)' id = '"+count+"'>수정하기</button></td>";
-			count++;
-			document.getElementById('content_list').appendChild(plus_object);
+				var today = new Date();  
+				var dateString = date;  
+			  	var dateArray = dateString.split("-");  
+			  	var dateObj = new Date(dateArray[0], Number(dateArray[1])-1, dateArray[2]);  
+			  	var betweenDay = Math.floor((dateObj.getTime() - today.getTime())/1000/60/60/24)+1; 
+
+			  	if(betweenDay < 0)
+				{
+					var color = '#D8D8D8';
+					var text_color = '#000000';
+					var hi_color = '#A4A4A4';
+				}
+				else if(betweenDay <= 3)
+				{
+					var color = '#F6CECE';
+					var text_color = '#FF0000';
+					var hi_color = '#F78181';
+				}
+				else if(betweenDay <= 7)
+				{
+					var color = '#F6E3CE';
+					var text_color = '#FF8000';
+					var hi_color = '#F7BE81';
+				}
+				else
+				{
+					var color = '#ffffff';
+					var text_color = '#000000';
+					var hi_color = '#E6E6E6';
+				}
+				content_Obj[now_edit_id].date = date;
+				content_Obj[now_edit_id].content = content;
+				content_Obj[now_edit_id].color = color;
+				content_Obj[now_edit_id].text_color = text_color;
+				content_Obj[now_edit_id].hi_color = hi_color;
+
+
+				content_copy[now_edit_copy_id].date = date;
+				content_copy[now_edit_copy_id].content = content;
+				content_copy[now_edit_copy_id].color = color;
+				content_copy[now_edit_copy_id].text_color = text_color;
+				content_copy[now_edit_copy_id].hi_color = hi_color;
+			if(now_mode == -1)
+			{
+				print_list(content_Obj);
+			}
+			else
+			{
+				print_list(content_copy);
+			}
+			
 			document.getElementById("content").value = "";
+		}
+		function edit_reset_f()
+		{
+			document.getElementById('date').value = "";
+			document.getElementById('content').value = "";
+			document.getElementById('edit_button').style.display = 'none';
+			document.getElementById('edit_reset').style.display = 'none';
+		}
+
+		var now_mode = -1;
+		var content_copy = [];
+		function sort(mode)
+		{
+			
+			content_copy = clone(content_Obj);
+			if(mode == 2)
+			{
+				print_list(content_Obj);
+				now_mode = -1;
+				return;
+			}
+				if(mode == 0 && now_mode != -2)
+				{
+					now_mode = -2;
+					content_copy.sort(function(a,b){
+						return a.date > b.date?-1:a.content>b.content?1:0;
+					})
+				}
+				else if(mode == 0 && now_mode == -2)
+				{
+					now_mode = 0;
+					content_copy.sort(function(a,b){
+						return a.date < b.date?-1:a.content>b.content?1:0;
+					})
+
+				}
+				else if(mode == 1 && now_mode != 1)
+				{
+					now_mode = 1;
+					content_copy.sort(function(a,b){
+						return a.content > b.content?-1:a.date>b.date?1:0;
+					})
+				}
+				else if(mode == 1 && now_mode == 1)
+				{
+					now_mode = 0;
+					content_copy.sort(function(a,b){
+						return a.content < b.content?-1:a.date>b.date?1:0;
+					})
+				}
+				print_list(content_copy);
+		}
+
+		function over(ele)
+		{
+			get_count = ele.getAttribute('id');
+			const finditem = content_Obj.find(function(item){
+				return item.id == get_count;
+			});
+			const idx = content_Obj.indexOf(finditem);
+			var hi_color = content_Obj[idx].hi_color;
+				ele.style.backgroundColor = hi_color;
+			
+		}
+		function out(ele)
+		{
+			get_count = ele.getAttribute('id');
+			const finditem = content_Obj.find(function(item){
+				return item.id == get_count;
+			});
+			const idx = content_Obj.indexOf(finditem);
+
+			var color = content_Obj[idx].color;
+				ele.style.backgroundColor = color;
+		}
+		var count = 0;
+		function plus_list()
+		{
+			var date = document.getElementById('date').value;
+			var content = document.getElementById('content').value;
+			var status = document.getElementById('select_p').value;
+			if(content== "" || date == "")
+			{
+				var alert_text = document.getElementById("alert_text");
+				var background = document.getElementById("body_content");
+				var alert_br = document.getElementById("alert_br");
+					alert_text.style.display = "block";
+					alert_br.style.display = "none";
+					background.style.backgroundColor = "#F6CECE";
+					setTimeout(function(){
+						alert_br.style.display = "inline";
+						alert_text.style.display = "none";
+						background.style.backgroundColor = "#FFFFFF";
+					},300);
+				return -1;
+			}
+			var today = new Date();  
+				var dateString = date;  
+			  	var dateArray = dateString.split("-");  
+			  	var dateObj = new Date(dateArray[0], Number(dateArray[1])-1, dateArray[2]);  
+			  	var betweenDay = Math.floor((dateObj.getTime() - today.getTime())/1000/60/60/24)+1; 
+			content_Obj.push(new to_do_content(count,date,content,betweenDay,status));
+			count++;
+			print_list(content_Obj);
+			document.getElementById("content").value = "";
+			content_copy = clone(content_Obj);
 		}
 
 		function delete_list(ele)
 		{
-			var get_count = document.getElementById(ele.getAttribute('id')).getAttribute('id');
-			var get_child = document.getElementById("line_content"+get_count);
-			var get_parent = document.getElementById("content_list");
+			var get_count = ele.getAttribute('id');
+			const finditem = content_Obj.find(function(item){
+				return item.id == get_count;
+			});
+			const idx = content_Obj.indexOf(finditem);
 
-			get_parent.removeChild(get_child);
-
+			const findcopyitem = content_copy.find(function(item){
+				return item.id == get_count;
+			});
+			const copy_idx = content_copy.indexOf(findcopyitem);
+			content_Obj.splice(idx,1);
+			content_copy.splice(copy_idx,1);
+			if(now_mode == -1)
+			{
+				print_list(content_Obj);
+			}
+			else
+			{
+				print_list(content_copy);
+			}
 		}
 		function key_down_event()
 		{
 			if(window.event.keyCode == 13)
 			{
 				let func_ans = plus_list();
-				if(func_ans == -1)
 				{
+				if(func_ans == -1)
 					return
 				}
 				var background = document.getElementById("body_content");
@@ -118,7 +398,18 @@
 	<form id="content_form" onsubmit="return false;">
 		<input type ="date" id="date">
 		<input type="text" name="item" id="content" onkeydown="key_down_event();" placeholder="일정을 입력하세요">
+		<select id="select_p" style="height : 25px;">
+			<option value="red">🔴</option>
+			<option value="org">🟠</option>
+			<option value="yel">🟡</option>
+			<option value="gre">🟢</option>
+		</select>
+		<button id="edit_button" type="button" onclick="edit_confirm(this)" style="display:none;">수정하기</button>
+		<button id="edit_reset" type="button" onclick="edit_reset_f()" style="display:none;">취소하기</button>
 	</form>
+	<button onclick="sort(0)">날짜순 정렬</button>
+	<button onclick="sort(1)">이름순 정렬</button>
+	<button onclick="sort(2)">정렬 되돌리기</button>
 	<span id="alert_text">날짜 또는 일정을 입력하지 않았습니다!!!</span>
 	<br id ="alert_br">
 	<table id = "content_list">
